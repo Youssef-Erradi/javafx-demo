@@ -1,7 +1,9 @@
 package gui;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -95,6 +97,38 @@ public class MainApplication extends Application {
 		TableColumn<Person, String> birthdayTableColumn = createColumn("Date de naissance", "formattedBirthday");
 		TableColumn<Person, String> sexTableColumn = createColumn("Sexe", "sex");
 		tableView.getColumns().addAll(idTableColumn, fullNameTableColumn, birthdayTableColumn, sexTableColumn);
+
+		tableView.setOnMouseClicked(event -> {
+			Person person = tableView.getSelectionModel().getSelectedItem();
+			showAlertBox(AlertType.INFORMATION, "Détails de personne", "informations de " + person.getFullName(),
+					person.toString());
+		});
+
+		resetBtn.setOnMouseClicked(event -> {
+			fullNameTextField.clear();
+			datePicker.setValue(null);
+			rbMale.setSelected(true);
+		});
+
+		submitBtn.setOnMouseClicked(event -> {
+			String fullname = fullNameTextField.getText().trim(),
+					sexe = (RadioButton) group.getSelectedToggle() == rbMale ? "Homme" : "Femme";
+			LocalDate date = datePicker.getValue();
+			
+			if (fullname.isEmpty() || date == null) {
+				showAlertBox(AlertType.WARNING, "Attention !", "Erreur de validation",
+						"veuillez remplir tous les champs");
+				return;
+			}
+			try {
+				Person person = new Person(fullname, sexe, DATE_FORMAT.parse(date.toString()) );
+				people.add(person);
+				showAlertBox(AlertType.INFORMATION, "Message d'information", "Personne ajouté avec succés",
+						person.toString());
+			} catch(ParseException e) {
+				e.printStackTrace();
+			}
+		});
 
 		root.setTop(vBoxForm);
 		root.setCenter(tableView);
