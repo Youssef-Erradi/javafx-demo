@@ -41,6 +41,10 @@ public class Person {
 	public Date getBirthday() {
 		return birthday;
 	}
+	
+	public String getFormattedBirthday() {
+		return new SimpleDateFormat("dd/MM/yyyy").format(birthday);
+	}
 
 	public void setBirthday(Date birthday) {
 		this.birthday = birthday;
@@ -71,7 +75,7 @@ public class Person {
 	@Override
 	public String toString() {
 		return "id : " + id + "\nNom complet : " + fullName + "\nSexe : " + sex + "\nDate de naissance : "
-				+ new SimpleDateFormat("dd/MM/yyyy").format(birthday);
+				+ getFormattedBirthday();
 	}
 
 }
