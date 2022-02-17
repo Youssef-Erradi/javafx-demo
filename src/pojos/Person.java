@@ -1,5 +1,6 @@
 package pojos;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -9,9 +10,9 @@ public class Person {
 	private String fullName;
 	private String sex;
 	private Date birthday;
-	
+
 	public Person() {
-		this.id = UUID.randomUUID().toString();
+		this.id = UUID.randomUUID().toString().split("-")[0];
 	}
 
 	public Person(String fullName, String sex, Date birthday) {
@@ -69,7 +70,8 @@ public class Person {
 
 	@Override
 	public String toString() {
-		return "Person [id=" + id + ", fullName=" + fullName + ", sex=" + sex + ", birthday=" + birthday + "]";
+		return "id : " + id + "\nNom complet : " + fullName + "\nSexe : " + sex + "\nDate de naissance : "
+				+ new SimpleDateFormat("dd/MM/yyyy").format(birthday);
 	}
 
 }
