@@ -5,10 +5,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
@@ -42,9 +45,36 @@ public class MainApplication extends Application {
 		ListView<String> listView = new ListView<>(observableList);
 		root.setCenter(listView);
 
+		addBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+			String name = nameTextField.getText().trim();
+			if (name.isEmpty()) {
+				showAlertBox(AlertType.ERROR, "Message d'erreur", "Valeur invalide",
+						"Vous devez remplire le champs nom");
+				return;
+			}
+			observableList.add(name);
+			nameTextField.clear();
+			showAlertBox(AlertType.INFORMATION, "Message d'information", "Ajouté avec succés",
+					"La personne `" + name + "` ajoutée à la liste.");
+		});
+
+		listView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
+			String selectedItem = listView.getSelectionModel().getSelectedItem();
+			showAlertBox(AlertType.INFORMATION, "Détails du personne", "informations sur `" + selectedItem + "`",
+					"nom : test\nage : 45ans\ntaille : 175cm");
+		});
+
 		primaryStage.setTitle("Demo JavaFX Application");
 		primaryStage.setScene(scene);
 		primaryStage.show();
+	}
+
+	private void showAlertBox(AlertType alertType, String title, String headerText, String contentText) {
+		Alert alert = new Alert(alertType);
+		alert.setTitle(title);
+		alert.setHeaderText(headerText);
+		alert.setContentText(contentText);
+		alert.showAndWait();
 	}
 
 }
