@@ -1,5 +1,8 @@
 package gui;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -8,61 +11,93 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import pojos.Person;
 
 public class MainApplication extends Application {
-
+	private final static DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		Insets insets = new Insets(5);
 		BorderPane root = new BorderPane();
 		Scene scene = new Scene(root);
 
-		Label label = new Label("Entrez un nom :");
-		label.setPadding(insets);
-		TextField nameTextField = new TextField();
-		nameTextField.setPadding(insets);
-		Button addBtn = new Button("Add");
-		addBtn.setPadding(insets);
+		VBox vBoxForm = new VBox(10);
+		vBoxForm.setPadding(insets);
 
-		HBox hBox = new HBox();
+		HBox hBox = new HBox(10);
 		hBox.setPadding(insets);
-		hBox.setSpacing(10);
-		hBox.getChildren().addAll(label, nameTextField, addBtn);
-		root.setTop(hBox);
 
-		ObservableList<String> observableList = FXCollections.observableArrayList();
-		ListView<String> listView = new ListView<>(observableList);
-		root.setCenter(listView);
+		// Full Name
+		Label label = new Label("Nom complet :");
+		label.setPadding(insets);
+		TextField fullNameTextField = new TextField();
+		fullNameTextField.setPadding(insets);
+		hBox.getChildren().addAll(label, fullNameTextField);
+		vBoxForm.getChildren().add(hBox);
 
-		addBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-			String name = nameTextField.getText().trim();
-			if (name.isEmpty()) {
-				showAlertBox(AlertType.ERROR, "Message d'erreur", "Valeur invalide",
-						"Vous devez remplire le champs nom");
-				return;
-			}
-			observableList.add(name);
-			nameTextField.clear();
-			showAlertBox(AlertType.INFORMATION, "Message d'information", "Ajouté avec succés",
-					"La personne `" + name + "` ajoutée à la liste.");
-		});
+		// Birthday
+		hBox = new HBox(10);
+		hBox.setPadding(insets);
+		label = new Label("Date de naissance :");
+		label.setPadding(insets);
+		DatePicker datePicker = new DatePicker();
+		hBox.getChildren().addAll(label, datePicker);
+		vBoxForm.getChildren().add(hBox);
 
-		listView.addEventHandler(MouseEvent.MOUSE_CLICKED, event -> {
-			String selectedItem = listView.getSelectionModel().getSelectedItem();
-			showAlertBox(AlertType.INFORMATION, "Détails du personne", "informations sur `" + selectedItem + "`",
-					"nom : test\nage : 45ans\ntaille : 175cm");
-		});
+		// Sex
+		hBox = new HBox(10);
+		hBox.setPadding(insets);
+		label = new Label("Sexe : ");
+		label.setPadding(insets);
+		ToggleGroup group = new ToggleGroup();
+		RadioButton rbMale = new RadioButton();
+		rbMale.setText("Homme");
+		rbMale.setToggleGroup(group);
+		rbMale.setSelected(true);
+		RadioButton rbFemale = new RadioButton();
+		rbFemale.setText("Femme");
+		rbFemale.setToggleGroup(group);
+		hBox.getChildren().addAll(label, rbMale, rbFemale);
+		vBoxForm.getChildren().add(hBox);
+
+		// Buttons
+		hBox = new HBox(10);
+		hBox.setPadding(insets);
+		Button submitBtn = new Button("Valider");
+		Button resetBtn = new Button("Réinitialiser");
+		hBox.getChildren().addAll(submitBtn, resetBtn);
+		vBoxForm.getChildren().add(hBox);
+
+		// TableView
+		ObservableList<Person> people = FXCollections.observableArrayList();
+		TableView<Person> tableView = new TableView<>(people);
+		tableView.setEditable(false);
+		TableColumn<Person, String> idTableColumn = createColumn("Identifiant", "id");
+		TableColumn<Person, String> fullNameTableColumn = createColumn("Nom complet", "fullName");
+		TableColumn<Person, String> birthdayTableColumn = createColumn("Date de naissance", "formattedBirthday");
+		TableColumn<Person, String> sexTableColumn = createColumn("Sexe", "sex");
+		tableView.getColumns().addAll(idTableColumn, fullNameTableColumn, birthdayTableColumn, sexTableColumn);
+
+		root.setTop(vBoxForm);
+		root.setCenter(tableView);
 
 		primaryStage.setTitle("Demo JavaFX Application");
 		primaryStage.setScene(scene);
@@ -75,6 +110,13 @@ public class MainApplication extends Application {
 		alert.setHeaderText(headerText);
 		alert.setContentText(contentText);
 		alert.showAndWait();
+	}
+
+	private TableColumn<Person, String> createColumn(String columnHeader, String propertyValue) {
+		TableColumn<Person, String> myTableColumn = new TableColumn<>(columnHeader);
+		myTableColumn.setMinWidth(100);
+		myTableColumn.setCellValueFactory(new PropertyValueFactory<>(propertyValue));
+		return myTableColumn;
 	}
 
 }
